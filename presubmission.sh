@@ -48,7 +48,7 @@ done
 
 # Start backend
 cd backend
-npm run backend > ../backend.log 2>&1 &
+npm run dev > ../backend.log 2>&1 &
 BACK_PID=$!
 cd ..
 sleep 2
