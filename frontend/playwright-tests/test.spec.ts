@@ -1,10 +1,34 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Notes App CRUD', () => {
+const testUser = {
+  name: 'Test User',
+  email: 'testuser@example.com',
+  username: 'testuser123',
+  password: 'testpassword',
+};
 
-  test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000');
+test.beforeEach(async ({ page, request }) => {
+  // Register the user (ignore errors if user already exists)
+  await request.post('http://localhost:3001/users', {
+    data: testUser,
   });
+
+  // Login to get the token and user
+  const res = await request.post('http://localhost:3001/login', {
+    data: { username: testUser.username, password: testUser.password },
+  });
+  const { token, user } = await res.json();
+
+  // Set token and user in localStorage before the app loads
+  await page.addInitScript(([token, user]) => {
+    window.localStorage.setItem('token', token);
+    window.localStorage.setItem('user', JSON.stringify(user));
+  }, [token, user]);
+
+  await page.goto('http://localhost:3000');
+});
+
+test.describe('Notes App CRUD', () => {
 
   test('Create a new note', async ({ page }) => {
     await page.getByRole('button', { name: 'Add New Note' }).click();
