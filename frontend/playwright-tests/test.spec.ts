@@ -8,15 +8,25 @@ const testUser = {
 };
 
 test.beforeEach(async ({ page, request }) => {
-  // Register the user (ignore errors if user already exists)
-  await request.post('http://localhost:3001/users', {
+  // Register the user (ignore errors if user already exists, but print for debug)
+  const regRes = await request.post('http://localhost:3001/users', {
     data: testUser,
   });
+  if (regRes.status() !== 201 && regRes.status() !== 400) {
+    console.log('Registration response status:', regRes.status());
+    console.log('Registration response body:', await regRes.text());
+  }
 
   // Login to get the token and user
   const res = await request.post('http://localhost:3001/login', {
     data: { username: testUser.username, password: testUser.password },
   });
+
+  if (res.status() !== 200) {
+    console.log('Login failed:', res.status(), await res.text());
+    throw new Error('Login failed');
+  }
+
   const { token, user } = await res.json();
 
   // Set token and user in localStorage before the app loads
