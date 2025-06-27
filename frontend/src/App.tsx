@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import { Note } from './types/Note';
+import { sanitizeHtml } from './utils/sanitizeHtml';
 
 const PER_PAGE = 10;
 const NOTES_URL = 'http://localhost:3001/notes';
@@ -24,6 +25,7 @@ function App() {
   const [notification, setNotification] = useState('Notification area');
   const { state, dispatch } = useNotesContext();
   const [notesCache, setNotesCache] = useState<{ [page: number]: Note[] }>({});
+  const [sanitizerEnabled, setSanitizerEnabled] = useState(true);
 
   const fetchNotesPage = async (page: number) => {
     try {
@@ -130,6 +132,31 @@ function App() {
                 Logout
               </button>
             )}
+            
+            {/* Sanitizer Toggle */}
+            <div className="sanitizer-controls">
+              <label>
+                <input
+                  type="radio"
+                  name="sanitizer"
+                  data-testid="sanitizer-on"
+                  checked={sanitizerEnabled}
+                  onChange={() => setSanitizerEnabled(true)}
+                />
+                Sanitizer ON (Safe)
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="sanitizer"
+                  data-testid="sanitizer-off"
+                  checked={!sanitizerEnabled}
+                  onChange={() => setSanitizerEnabled(false)}
+                />
+                Sanitizer OFF (Vulnerable)
+              </label>
+            </div>
+            
             <div className="notification">{notification}</div>
             {state.notes.map((note: Note) => (
               <div key={note._id} className="note" data-testid={note._id}>
@@ -142,9 +169,12 @@ function App() {
                 {editNoteId === note._id ? (
                   <>
                     <textarea
+                      rows={6}
+                      cols={60}
                       data-testid={`text_input-${note._id}`}
                       name={`text_input-${note._id}`}
                       value={editContent}
+                      placeholder="Edit note content with HTML formatting..."
                       onChange={(e) => setEditContent(e.target.value)}
                     />
                     <button
@@ -176,7 +206,12 @@ function App() {
                   </>
                 ) : (
                   <>
-                    <p>{note.content}</p>
+                    <div 
+                      className="note-content"
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizerEnabled ? sanitizeHtml(note.content) : note.content
+                      }}
+                    />
                     {isLoggedIn && isAuthor(note) && (
                       <button
                         data-testid={`edit-${note._id}`}
@@ -222,12 +257,17 @@ function App() {
             )}
             {isLoggedIn && isAdding && (
               <div>
-                <input
-                  type="text"
+                <h3>Create Rich Note (HTML supported)</h3>
+                <p>You can use HTML tags like &lt;b&gt;, &lt;i&gt;, &lt;img&gt;, etc.</p>
+                <textarea
+                  rows={6}
+                  cols={60}
                   value={newNoteContent}
                   name="text_input_new_note"
+                  placeholder="Enter note content with HTML formatting..."
                   onChange={(e) => setNewNoteContent(e.target.value)}
                 />
+                <br />
                 <button
                   name="text_input_save_new_note"
                   onClick={async () => {
@@ -235,8 +275,8 @@ function App() {
                       const created = await axios.post(
                         NOTES_URL,
                         {
-                          content: `Content for note ${newNoteContent}`,
-                          title: `Note ${newNoteContent}`,
+                          content: newNoteContent,
+                          title: `Rich Note ${Date.now()}`,
                           author: {
                             name: user?.name || '',
                             email: user?.email || '',

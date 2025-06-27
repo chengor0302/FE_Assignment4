@@ -1,6 +1,6 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f3e8ff; /* light lavender */
+  background-color: #f3e8ff; 
   margin: 0;
   padding: 0;
   color: #3b0764;
@@ -72,4 +72,71 @@ button.active {
   background-color: #6b21a8;
   color: white;
   font-weight: bold;
+}
+
+/* Rich Notes Styling */
+.sanitizer-controls {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+  text-align: left;
+  border: 2px solid #ddd6fe;
+}
+
+.sanitizer-controls label {
+  display: block;
+  margin: 8px 0;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.sanitizer-controls input[type="radio"] {
+  margin-right: 10px;
+}
+
+.note-content {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  min-height: 60px;
+  border: 1px solid #e5e5e5;
+}
+
+.notification {
+  margin: 15px 0;
+  color: #6b21a8;
+  font-weight: 500;
+}
+
+textarea {
+  width: 100%;
+  max-width: 600px;
+  padding: 12px;
+  border: 2px solid #ddd6fe;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #6b21a8;
+}
+
+/* XSS Demo Styles */
+.xss-demo {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.xss-demo h3 {
+  color: #856404;
+  margin-top: 0;
 }
