@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 
-// Extend Window interface for XSS test variables
 declare global {
   interface Window {
     xssExecuted?: boolean;
@@ -35,7 +34,7 @@ test.describe('Notes App CRUD', () => {
     await page.fill('[data-testid="login_form_password"]', 'tamarr');
     await page.click('[data-testid="login_form_login"]');
 
-    // Check for logout button as a sign of successful login
+    // Check for logout button
     await expect(page.locator('[data-testid="logout"]')).toBeVisible({ timeout: 5000 });
     await page.getByRole('button', { name: 'Add New Note' }).click();
 
@@ -70,7 +69,7 @@ test.describe('Notes App CRUD', () => {
     await page.fill('[data-testid="login_form_password"]', 'tamarr');
     await page.click('[data-testid="login_form_login"]');
 
-    // Check for logout button as a sign of successful login
+    // Check for logout button
     await expect(page.locator('[data-testid="logout"]')).toBeVisible({ timeout: 5000 });
     const editButton = page.locator('[data-testid^="edit-"]').first();
     await editButton.waitFor({ state: 'visible', timeout: 5000 });
@@ -96,7 +95,7 @@ test.describe('Notes App CRUD', () => {
     await page.fill('[data-testid="login_form_password"]', 'tamarr');
     await page.click('[data-testid="login_form_login"]');
 
-    // Check for logout button as a sign of successful login
+    // Check for logout button 
     await expect(page.locator('[data-testid="logout"]')).toBeVisible({ timeout: 5000 });
     const deleteButton = page.locator('[name^="delete-"]').first();
     await deleteButton.waitFor({ state: 'visible', timeout: 5000 });
@@ -128,8 +127,7 @@ test.describe('Rich Notes XSS and Sanitization', () => {
     
     // Ensure sanitizer is ON
     await page.check('[data-testid="sanitizer-on"]');
-    
-    // Create a rich HTML note
+  
     await page.getByRole('button', { name: 'Add New Note' }).click();
     
     const richHtmlContent = '<b>Bold text</b> and <i>italic text</i>';
@@ -139,14 +137,12 @@ test.describe('Rich Notes XSS and Sanitization', () => {
     // Verify the note was created
     await expect(page.locator('.notification')).toHaveText('Added a new note', { timeout: 10000 });
     
-    // Wait for the note to be rendered and navigate to page 1 where new notes appear
     await page.waitForTimeout(1000);
     
-    // Click "First" button to go to page 1 where the newly created note is
+    // Click "First" button to go to page 1 because the newly created note is on the first page
     await page.click('[name="first"]');
     await page.waitForTimeout(500);
     
-    // Find the note that contains our rich HTML content
     const noteContent = page.locator('.note-content').filter({ hasText: 'Bold text' }).first();
     
     // Check that the HTML content contains the tags
@@ -154,11 +150,9 @@ test.describe('Rich Notes XSS and Sanitization', () => {
     expect(htmlContent).toContain('<b>Bold text</b>');
     expect(htmlContent).toContain('<i>italic text</i>');
     
-    // Also verify the elements are visually present
     await expect(noteContent.locator('b')).toBeVisible();
     await expect(noteContent.locator('i')).toBeVisible();
     
-    // Cleanup: Delete the test note
     await noteContent.locator('..').locator('[name^="delete-"]').click();
     await expect(page.locator('.notification')).toHaveText('Note deleted', { timeout: 5000 });
   });
@@ -175,23 +169,15 @@ test.describe('Rich Notes XSS and Sanitization', () => {
     
     // Turn OFF sanitizer
     await page.check('[data-testid="sanitizer-off"]');
-    
-    // Create a note with XSS payload
     await page.getByRole('button', { name: 'Add New Note' }).click();
     
     // Use img tag with onerror for XSS (more likely to work than script tags)
     const xssPayload = '<img src="nonexistent.jpg" onerror="window.xssExecuted = true; console.log(\'XSS executed!\');">';
     await page.fill('[name="text_input_new_note"]', xssPayload);
     await page.click('[name="text_input_save_new_note"]');
-    
-    // Wait for note to be created
     await expect(page.locator('.notification')).toHaveText('Added a new note', { timeout: 10000 });
-    
-    // Check if XSS was executed by evaluating JavaScript
     const xssExecuted = await page.evaluate(() => window.xssExecuted);
     expect(xssExecuted).toBe(true);
-    
-    // Cleanup: Delete the XSS test note
     await page.click('[name="first"]');
     await page.waitForTimeout(500);
     await page.locator('[name^="delete-"]').first().click();

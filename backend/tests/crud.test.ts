@@ -25,7 +25,6 @@ describe('Backend API Tests', () => {
   });
 
   afterAll(async () => {
-    // Clean up test data
     await mongoose.connection.collection('users').deleteMany({ username: testUser.username });
     if (createdNoteId) {
       await mongoose.connection.collection('notes').deleteMany({ _id: new mongoose.Types.ObjectId(createdNoteId) });
@@ -60,7 +59,6 @@ describe('Backend API Tests', () => {
       expect(res.body).toHaveProperty('user');
       expect(res.body.user).toHaveProperty('username', testUser.username);
       
-      // Store token for authenticated requests
       authToken = res.body.token;
     });
 
@@ -146,7 +144,6 @@ describe('Backend API Tests', () => {
     });
 
     it('fails to delete note without authentication', async () => {
-      // First create a note to try to delete
       const createRes = await request(app)
         .post('/notes')
         .set('Authorization', `Bearer ${authToken}`)
@@ -162,7 +159,6 @@ describe('Backend API Tests', () => {
       const res = await request(app).delete(`/notes/${noteId}`);
       expect(res.statusCode).toBe(401);
       
-      // Clean up - delete with auth
       await request(app)
         .delete(`/notes/${noteId}`)
         .set('Authorization', `Bearer ${authToken}`);
@@ -184,7 +180,6 @@ describe('Backend API Tests', () => {
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty('content', richHtmlContent);
       
-      // Clean up
       await request(app)
         .delete(`/notes/${res.body._id}`)
         .set('Authorization', `Bearer ${authToken}`);
@@ -204,7 +199,6 @@ describe('Backend API Tests', () => {
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty('content', xssPayload);
       
-      // Clean up
       await request(app)
         .delete(`/notes/${res.body._id}`)
         .set('Authorization', `Bearer ${authToken}`);

