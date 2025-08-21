@@ -1,38 +1,38 @@
-# FE Assignment 3 – User Management & Authentication
+# FE Assignment 4 – Rich Notes & Web Security (XSS)
 
-This project is a continuation of previous frontend assignments. It adds user management and authentication functionality to the website. The work was done in collaboration with team members, and all commits retain the original authorship.
+This project extends the previous note-taking application to support **rich text notes** and explores **XSS (Cross-Site Scripting) vulnerabilities** and defenses. The work was done in collaboration with team members, and all commits retain original authorship.
 
 ---
 
 ## Project Overview
 
-The application allows **registered users** to create, edit, and delete notes, while **guests** can only view notes. Key features include:
-
-- User registration and login with JWT authentication
-- Edit/Delete buttons visible only for the note’s author
-- Notes and users stored in a MongoDB database
-- Client-side caching in React to reduce unnecessary API requests
-- Role-based access control for note management
+The application now allows users to create notes with **HTML formatting** (e.g., `<b>`, `<i>`, `<img>`), demonstrating how rich content can introduce **XSS vulnerabilities**. Users can toggle a sanitizer to defend against malicious scripts. The project includes an attacker server to demonstrate keylogger attacks and Playwright tests to verify both vulnerable and protected behaviors.
 
 ---
 
 ## Features
 
-- **User Authentication:** Users can register and log in; a token is stored in React state and sent in the Authorization header for API requests.
-- **Note CRUD:** Create, read, update, and delete notes; only the author can modify their notes.
-- **Caching:** 5 pages of notes are pre-fetched and cached for faster browsing.
-- **Routing:**  
-  - `/` – Homepage showing notes for all users  
-  - `/login` – Login page  
-  - `/create-user` – User registration page
-- **Frontend Testing:** Playwright tests for all CRUD operations
-- **Backend Testing:** Jest tests for CRUD operations and authentication
+- **Rich Notes:** Users can create notes with HTML formatting (bold, italic, images, etc.).
+- **XSS Vulnerability Demonstration:** Shows how unsafe HTML rendering can allow keylogger payloads.
+- **Sanitizer & Defense:**  
+  - Sanitizer removes dangerous tags/attributes (e.g., `<script>`, `onerror`) while allowing safe formatting.  
+  - Frontend toggle allows switching between sanitized and raw HTML rendering.
+- **Attacker Server:** Logs keystrokes sent by the keylogger payload.
+- **Testing:**  
+  - Playwright tests verify rich text rendering, XSS vulnerability with sanitizer OFF, and defense with sanitizer ON.  
+  - Covers CRUD operations for notes.
+- **Frontend & Backend:** Same functionality as previous assignment, extended for rich notes.
 
 ---
 
 ## Technologies Used
 
-- **Frontend:** React, TypeScript, Axios, React Router
-- **Backend:** Node.js, Express, TypeScript, MongoDB, Mongoose, bcrypt, JSON Web Token (JWT)  
-- **Testing:** Playwright (Frontend), Jest (Backend)  
-- **Dev Tools:** ESLint, Nodemon
+- **Frontend:** React, TypeScript, Axios, React Router, TailwindCSS  
+- **Backend:** Node.js, Express, TypeScript, MongoDB, Mongoose  
+- **Security:** XSS demonstration, sanitizer function for safe HTML rendering  
+- **Testing:** Playwright (Frontend), Jest (Backend)   
+
+---
+
+## Project Structure Example
+
